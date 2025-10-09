@@ -7,7 +7,7 @@ export class TexCount extends BaseTool {
     }
 
     getDependencyPaths(): string[] {
-        return [];
+        return ['/Algorithm/Diff.pm',];
     }
 
     async count(options: TexCountOptions): Promise<ScriptResult> {
@@ -16,6 +16,7 @@ export class TexCount extends BaseTool {
 
     protected buildArguments(
         inputPath: string,
+        newPath: "",
         outputPath: string,
         options: ScriptRunOptions
     ): string[] {

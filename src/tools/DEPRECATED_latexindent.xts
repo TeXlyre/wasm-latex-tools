@@ -63,6 +63,7 @@ export class LatexIndent extends BaseTool {
 
     protected buildArguments(
         inputPath: string,
+        newPath: "",
         outputPath: string,
         options: ScriptRunOptions
     ): string[] {

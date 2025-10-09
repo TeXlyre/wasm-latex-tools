@@ -56,6 +56,23 @@
                 </label>
             </div>
 
+            <label>
+                <input type="radio" name="tool" value="latexdiff">
+                LaTeX Diff (WebPerl)
+            </label>
+
+            <div class="tool-options" id="latexdiff-options" style="display: none;">
+                <label>
+                    Markup type:
+                    <select id="diff-type">
+                        <option value="UNDERLINE" selected>Underline</option>
+                        <option value="CTRADITIONAL">Color Traditional</option>
+                        <option value="CFONT">Color Font</option>
+                        <option value="CHANGEBAR">Change Bar</option>
+                    </select>
+                </label>
+            </div>
+
             <button id="run-tool" class="primary-button">Run Tool</button>
             <button id="clear-output">Clear Output</button>
         </div>

@@ -1,6 +1,6 @@
 // base-tool.ts (new)
 import { WebPerlRunner } from '../core/webperl-runner';
-import { ScriptResult, ScriptRunOptions } from '../core/types';
+import { ScriptResult, ScriptRunOptions, LatexDiffOptions } from '../core/types';
 import { Logger } from '../utils/logger';
 
 type VfsInput = { fn: string; text: string };
@@ -9,7 +9,7 @@ export abstract class BaseTool {
     protected runner: WebPerlRunner;
     protected logger: Logger;
     private filesLoaded = false;
-    private preloadedFiles: VfsInput[] = []; // ⬅ cache files instead of writing via Perl
+    public preloadedFiles: VfsInput[] = []; // ⬅ cache files instead of writing via Perl
 
     constructor(runner: WebPerlRunner, verbose: boolean = false) {
         this.runner = runner;
@@ -52,6 +52,25 @@ export abstract class BaseTool {
         }
         this.preloadedFiles = inputs; // ⬅ keep in memory
     }
+    protected async executeLatexDiff(options: LatexDiffOptions): Promise<ScriptResult> {
+        await this.ensureLoaded();
+
+        const t = Date.now();
+        const oldPath = `/tmp/old_${t}.tex`;
+        const newPath = `/tmp/new_${t}.tex`;
+        const outputPath = `/tmp/diff_${t}.tex`;
+
+        const args = this.buildArguments(oldPath, newPath, outputPath, options);
+
+        const inputs = [
+            ...this.preloadedFiles,
+            { fn: oldPath, text: options.oldContent },
+            { fn: newPath, text: options.input }
+        ];
+        const outputs = [outputPath];
+
+        return this.runner.runScript(args, inputs, outputs);
+    }
 
     protected async executeScript(options: ScriptRunOptions): Promise<ScriptResult> {
         await this.ensureLoaded();
@@ -60,7 +79,7 @@ export abstract class BaseTool {
         const inputPath = `/tmp/input_${t}.tex`;
         const outputPath = `/tmp/output_${t}.tex`;
 
-        const args = this.buildArguments(inputPath, outputPath, options);
+        const args = this.buildArguments(inputPath, "", outputPath, options);
 
         // ⬅ SINGLE run: write all deps + main script + this run’s input
         const inputs = [
@@ -74,6 +93,7 @@ export abstract class BaseTool {
 
     protected abstract buildArguments(
         inputPath: string,
+        newPath: string,
         outputPath: string,
         options: ScriptRunOptions
     ): string[];

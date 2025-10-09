@@ -7,8 +7,10 @@ import {
     WebPerlRunner,
     TexCount,
     TexFmt,
+    LatexDiff,
     TexCountOptions,
-    TexFmtOptions
+    TexFmtOptions,
+    LatexDiffOptions
 } from '../../../src';
 
 import './styles.css';
@@ -33,10 +35,11 @@ class LatexToolsDemo {
     private inputEditor: EditorView;
     private outputView: HTMLElement;
     private runner: WebPerlRunner;
-    // private latexIndent: LatexIndent;
     private texCount: TexCount;
     private texFmt: TexFmt;
-    private currentTool: 'texcount' | 'texfmt' = 'texfmt';
+    private latexDiff: LatexDiff;
+    private currentTool: 'texcount' | 'texfmt' | 'latexdiff' = 'texfmt';
+    private oldContent: string = '';
 
     constructor() {
         this.runner = new WebPerlRunner({
@@ -45,9 +48,9 @@ class LatexToolsDemo {
             verbose: true
         });
 
-        // this.latexIndent = new LatexIndent(this.runner, true);
         this.texCount = new TexCount(this.runner, true);
         this.texFmt = new TexFmt(true);
+        this.latexDiff = new LatexDiff(this.runner, true);
 
         this.inputEditor = this.createInputEditor();
         this.outputView = document.getElementById('output-display')!;
@@ -78,7 +81,7 @@ class LatexToolsDemo {
         document.querySelectorAll('input[name="tool"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const target = e.target as HTMLInputElement;
-                this.currentTool = target.value as 'texcount' | 'texfmt';
+                this.currentTool = target.value as 'texcount' | 'texfmt' | 'latexdiff';
                 this.updateToolOptions();
             });
         });
@@ -93,13 +96,13 @@ class LatexToolsDemo {
     }
 
     private updateToolOptions(): void {
-        // const latexindentOptions = document.getElementById('latexindent-options')!;
         const texcountOptions = document.getElementById('texcount-options')!;
         const texfmtOptions = document.getElementById('texfmt-options')!;
+        const latexdiffOptions = document.getElementById('latexdiff-options')!;
 
-        // latexindentOptions.style.display = this.currentTool === 'latexindent' ? 'block' : 'none';
         texcountOptions.style.display = this.currentTool === 'texcount' ? 'block' : 'none';
         texfmtOptions.style.display = this.currentTool === 'texfmt' ? 'block' : 'none';
+        latexdiffOptions.style.display = this.currentTool === 'latexdiff' ? 'block' : 'none';
     }
 
     private async initializeTools(): Promise<void> {
@@ -126,6 +129,8 @@ class LatexToolsDemo {
         try {
             if (this.currentTool === 'texcount') {
                 await this.runTexCount(input);
+            } else if (this.currentTool === 'latexdiff') {
+                await this.runLatexDiff(input);
             } else {
                 await this.runTexFmt(input);
             }
@@ -176,6 +181,30 @@ class LatexToolsDemo {
         }
     }
 
+    private async runLatexDiff(input: string): Promise<void> {
+        if (!this.oldContent) {
+            this.oldContent = input;
+            this.setStatus('Saved current version as "old". Make changes and run again to see diff.', 'success');
+            return;
+        }
+
+        const options: LatexDiffOptions = {
+            input,
+            oldContent: this.oldContent,
+            type: (document.getElementById('diff-type') as HTMLSelectElement).value as any
+        };
+
+        const result = await this.latexDiff.diff(this.oldContent, input, options);
+
+        if (result.success) {
+            this.displayOutput(result.output, false);
+            this.setStatus('Diff completed. Click "Clear Output" to reset for new comparison.', 'success');
+        } else {
+            this.displayOutput(result.error || 'Unknown error', true);
+            this.setStatus('Diff failed', 'error');
+        }
+    }
+
     private displayOutput(text: string, isError: boolean = false): void {
         this.outputView.innerHTML = '';
         const pre = document.createElement('pre');
@@ -204,7 +233,12 @@ class LatexToolsDemo {
 
     private clearOutput(): void {
         this.outputView.innerHTML = '';
-        this.setStatus('Output cleared', 'info');
+        if (this.currentTool === 'latexdiff') {
+            this.oldContent = '';
+            this.setStatus('Output cleared. Old content reset.', 'info');
+        } else {
+            this.setStatus('Output cleared', 'info');
+        }
     }
 
     private setStatus(message: string, type: 'info' | 'success' | 'error' | 'warning'): void {

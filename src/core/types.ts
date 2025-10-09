@@ -43,6 +43,21 @@ export interface TexCountOptions extends ScriptRunOptions {
     verbose?: number;
 }
 
+export interface LatexDiffOptions extends ScriptRunOptions {
+    oldContent: string;
+    type?: 'UNDERLINE' | 'CTRADITIONAL' | 'TRADITIONAL' | 'CFONT' | 'FONTSTRIKE' | 'CCHANGEBAR' | 'CFONTCHBAR' | 'CULINECHBAR' | 'CHANGEBAR' | 'INVISIBLE' | 'BOLD' | 'PDFCOMMENT';
+    subtype?: string;
+    floattype?: 'FLOATSAFE' | 'IDENTICAL';
+    encoding?: string;
+    excludeSafecmd?: string;
+    appendSafecmd?: string;
+    excludeTextcmd?: string;
+    appendTextcmd?: string;
+    mathMarkup?: number;
+    allowSpaces?: boolean;
+    flatten?: boolean;
+}
+
 export interface EmscriptenFS {
     writeFile(path: string, data: string | Uint8Array, options?: { encoding?: string }): void;
     readFile(path: string, options?: { encoding?: string }): string | Uint8Array;
