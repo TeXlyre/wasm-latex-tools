@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>WebPerl Runner</title>
+</head>
+
+<body>
+    <p>Perl Runner Loading...</p>
+
+    <script src="emperl.js"></script>
+    <script>
+        "use strict";
+
+        var perlReady = false;
+
+        Perl.noInitialRun = true;
+
+        Perl.output = function (text) {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    perlOutput: { chan: 1, data: text }
+                }, '*');
+            } else {
+                console.log('Output:', text);
+            }
+        };
+
+        function ensureDirectory(filepath) {
+            var parts = filepath.split('/').filter(function (p) { return p; });
+            parts.pop();
+
+            var path = '';
+            for (var i = 0; i < parts.length; i++) {
+                path += '/' + parts[i];
+                try {
+                    FS.mkdir(path);
+                } catch (e) {
+                    if (e.code !== 'EEXIST') {
+                        console.warn('mkdir failed for', path, e);
+                    }
+                }
+            }
+        }
+
+        Perl.init(function () {
+            console.log('Perl initialized and ready');
+            perlReady = true;
+
+            if (window.parent !== window) {
+                window.parent.postMessage({ perlRunnerState: 'Ready' }, '*');
+            }
+        });
+
+        window.addEventListener('message', function (event) {
+            var data = event.data;
+
+            if (data.perlRunnerDiscovery) {
+                if (perlReady) {
+                    window.parent.postMessage({ perlRunnerState: 'Ready' }, '*');
+                }
+                return;
+            }
+
+            if (!data.runPerl) return;
+
+            if (!perlReady) {
+                window.parent.postMessage({
+                    perlRunnerError: 'Perl not ready yet'
+                }, '*');
+                return;
+            }
+
+            try {
+                var runData = data.runPerl;
+                var argv = runData.argv || [];
+                var inputs = runData.inputs || [];
+                var outputs = runData.outputs || [];
+
+                console.log('Run request:', { argv: argv, inputs: inputs.map(function (i) { return i.fn; }), outputs: outputs });
+
+                // Write input files
+                inputs.forEach(function (inp) {
+                    try {
+                        ensureDirectory('/' + inp.fn);
+                        FS.writeFile('/' + inp.fn, inp.text);
+                        console.log('Wrote input file:', '/' + inp.fn, 'size:', inp.text.length);
+                    } catch (e) {
+                        console.error('Could not write input file', inp.fn, e);
+                        window.parent.postMessage({
+                            perlRunnerError: 'Could not write input file ' + inp.fn + ': ' + e
+                        }, '*');
+                        return;
+                    }
+                });
+
+                console.log('Starting Perl with argv:', argv);
+
+                // Run Perl
+                try {
+                    Perl.start(argv);
+                } catch (e) {
+                    if (e !== 'unwind') {
+                        console.error('Perl execution error:', e);
+                        window.parent.postMessage({
+                            perlRunnerError: 'Execution error: ' + e
+                        }, '*');
+                    }
+                }
+
+                // Read output files after execution
+                setTimeout(function () {
+                    var outputFiles = [];
+                    outputs.forEach(function (fn) {
+                        try {
+                            var content = FS.readFile('/' + fn, { encoding: 'utf8' });
+                            outputFiles.push({ fn: fn, text: content });
+                            console.log('Read output file:', '/' + fn, 'length:', content.length);
+                        } catch (e) {
+                            console.log('Could not read output file', '/' + fn);
+                        }
+                    });
+
+                    if (outputFiles.length > 0) {
+                        window.parent.postMessage({
+                            perlOutputFiles: outputFiles
+                        }, '*');
+                    }
+
+                    var exitStatus = Perl.exitStatus || 0;
+
+                    window.parent.postMessage({
+                        perlRunnerState: 'Ended',
+                        exitStatus: exitStatus
+                    }, '*');
+
+                    // Reload to reset Perl state
+                    setTimeout(function () {
+                        location.reload();
+                    }, 100);
+                }, 50);
+
+            } catch (error) {
+                console.error('Runner error:', error);
+                window.parent.postMessage({
+                    perlRunnerError: 'Runner error: ' + error.toString()
+                }, '*');
+                window.parent.postMessage({
+                    perlRunnerState: 'Ended',
+                    exitStatus: 1
+                }, '*');
+                setTimeout(function () {
+                    location.reload();
+                }, 100);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>WebPerl Test</title>
+</head>
+
+<body>
+    <h1>WebPerl Test</h1>
+    <div id="status">Loading Perl...</div>
+    <button id="runtest" onclick="runTest()" disabled>Run Test</button>
+    <h2>Output:</h2>
+    <pre id="output"></pre>
+
+    <script src="emperl.js"></script>
+    <script>
+        var perlReady = false;
+
+        Perl.noInitialRun = true;
+
+        Perl.output = function (text) {
+            console.log('Output:', text);
+            var output = document.getElementById('output');
+            if (output) output.textContent += text + '\n';
+        };
+
+        Perl.init(function () {
+            console.log('Perl initialized and ready');
+            perlReady = true;
+
+            var status = document.getElementById('status');
+            if (status) status.textContent = 'Perl is ready!';
+
+            var btn = document.getElementById('runtest');
+            if (btn) btn.disabled = false;
+        });
+
+        function runTest() {
+            document.getElementById('output').textContent = '';
+
+            if (!perlReady) {
+                document.getElementById('output').textContent = 'Perl not ready yet';
+                return;
+            }
+
+            try {
+                // Write a test script to a file
+                FS.writeFile('/test.pl', 'print "Hello from Perl!\\n"; print STDERR "This is stderr\\n";');
+
+                // Run the script
+                Perl.start(['/test.pl']);
+            } catch (e) {
+                if (e !== 'unwind') {
+                    document.getElementById('output').textContent += 'Error: ' + e + '\n';
+                    console.error(e);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

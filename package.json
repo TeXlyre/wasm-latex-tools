@@ -1,0 +1,38 @@
+{
+    "name": "webperl-latex-tools",
+    "version": "1.0.0",
+    "description": "Run LaTeX tools (latexindent, texcount) in the browser using WebPerl",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc && rollup -c",
+        "dev": "tsc --watch",
+        "example": "cd example/github-pages-example && npm install && npm start",
+        "copy-webperl": "node scripts/copy-webperl.cjs",
+        "prepare": "node scripts/copy-webperl.cjs && npm run build"
+    },
+    "keywords": [
+        "latex",
+        "webperl",
+        "latexindent",
+        "texcount",
+        "browser",
+        "wasm"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "rollup": "^3.29.0",
+        "rollup-plugin-dts": "^6.0.0",
+        "rollup-plugin-typescript2": "^0.36.0",
+        "typescript": "^5.2.0"
+    },
+    "files": [
+        "dist/",
+        "public/",
+        "README.md",
+        "LICENSE"
+    ]
+}

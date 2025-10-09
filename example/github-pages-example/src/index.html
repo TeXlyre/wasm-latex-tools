@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebPerl LaTeX Tools Demo</title>
+</head>
+
+<body>
+    <header>
+        <h1>WebPerl LaTeX Tools</h1>
+        <p>Run LaTeX tools (latexindent, texcount) directly in your browser</p>
+    </header>
+
+    <main>
+        <div class="controls">
+            <div class="tool-selector">
+                <label>
+                    <input type="radio" name="tool" value="latexindent" checked>
+                    LaTeX Indent
+                </label>
+                <label>
+                    <input type="radio" name="tool" value="texcount">
+                    TeX Count
+                </label>
+            </div>
+
+            <div class="tool-options" id="latexindent-options">
+                <label>
+                    <input type="checkbox" id="silent" checked> Silent mode
+                </label>
+                <label>
+                    <input type="checkbox" id="overwrite"> Overwrite
+                </label>
+            </div>
+
+            <div class="tool-options" id="texcount-options" style="display: none;">
+                <label>
+                    <input type="checkbox" id="brief" checked> Brief
+                </label>
+                <label>
+                    <input type="checkbox" id="total"> Total
+                </label>
+                <label>
+                    <input type="checkbox" id="sum"> Sum
+                </label>
+                <label>
+                    Verbosity: <input type="number" id="verbose" min="0" max="4" value="0">
+                </label>
+            </div>
+
+            <button id="run-tool" class="primary-button">Run Tool</button>
+            <button id="clear-output">Clear Output</button>
+        </div>
+
+        <div class="editors">
+            <div class="editor-panel">
+                <h3>Input</h3>
+                <div id="input-editor"></div>
+            </div>
+
+            <div class="editor-panel">
+                <h3>Output</h3>
+                <div id="output-display"></div>
+            </div>
+        </div>
+
+        <div id="status" class="status"></div>
+    </main>
+
+    <footer>
+        <p>MIT License &copy; 2025 | Powered by WebPerl</p>
+    </footer>
+</body>
+
+</html>
