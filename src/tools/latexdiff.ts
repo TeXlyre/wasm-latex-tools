@@ -7,7 +7,7 @@ export class LatexDiff extends BaseTool {
     }
 
     getDependencyPaths(): string[] {
-        return [];
+        return ['/Algorithm/Diff.pm',];
     }
 
     async diff(oldContent: string, newContent: string, options?: LatexDiffOptions): Promise<ScriptResult> {
