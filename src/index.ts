@@ -1,8 +1,8 @@
 export { WebPerlRunner } from './core/webperl-runner';
 export { FileSystemManager } from './core/filesystem-manager';
 export { ScriptLoader } from './core/script-loader';
-export { LatexIndent } from './tools/latexindent';
 export { TexCount } from './tools/texcount';
+export { TexFmt } from './tools/texfmt';
 export type { TexCountResult } from './tools/texcount';
 export { Logger } from './utils/logger';
 
@@ -10,7 +10,7 @@ export type {
     WebPerlConfig,
     ScriptRunOptions,
     ScriptResult,
-    LatexIndentOptions,
     TexCountOptions,
+    TexFmtOptions,
     ToolType
 } from './core/types';

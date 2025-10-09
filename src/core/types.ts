@@ -25,13 +25,15 @@ export interface PerlScript {
 
 export enum ToolType {
     LATEXINDENT = 'latexindent',
-    TEXCOUNT = 'texcount'
+    TEXCOUNT = 'texcount',
+    TEXFMT = 'texfmt'
 }
 
-export interface LatexIndentOptions extends ScriptRunOptions {
-    silent?: boolean;
-    overwrite?: boolean;
-    localSettings?: string;
+export interface TexFmtOptions extends ScriptRunOptions {
+    wrap?: boolean;
+    wraplen?: number;
+    tabsize?: number;
+    usetabs?: boolean;
 }
 
 export interface TexCountOptions extends ScriptRunOptions {

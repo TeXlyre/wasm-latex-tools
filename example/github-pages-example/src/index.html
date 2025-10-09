@@ -10,15 +10,15 @@
 <body>
     <header>
         <h1>WebPerl LaTeX Tools</h1>
-        <p>Run LaTeX tools (latexindent, texcount) directly in your browser</p>
+        <p>Run LaTeX tools (tex-fmt, texcount) directly in your browser</p>
     </header>
 
     <main>
         <div class="controls">
             <div class="tool-selector">
                 <label>
-                    <input type="radio" name="tool" value="latexindent" checked>
-                    LaTeX Indent
+                    <input type="radio" name="tool" value="texfmt" checked>
+                    TeX-Fmt (WASM)
                 </label>
                 <label>
                     <input type="radio" name="tool" value="texcount">
@@ -26,12 +26,18 @@
                 </label>
             </div>
 
-            <div class="tool-options" id="latexindent-options">
+            <div class="tool-options" id="texfmt-options">
                 <label>
-                    <input type="checkbox" id="silent" checked> Silent mode
+                    <input type="checkbox" id="wrap" checked> Wrap lines
                 </label>
                 <label>
-                    <input type="checkbox" id="overwrite"> Overwrite
+                    Wrap length: <input type="number" id="wraplen" min="40" max="120" value="80">
+                </label>
+                <label>
+                    Tab size: <input type="number" id="tabsize-fmt" min="1" max="8" value="2">
+                </label>
+                <label>
+                    <input type="checkbox" id="usetabs"> Use tabs
                 </label>
             </div>
 

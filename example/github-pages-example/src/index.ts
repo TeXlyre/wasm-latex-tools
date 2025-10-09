@@ -5,10 +5,10 @@ import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 
 import {
     WebPerlRunner,
-    LatexIndent,
     TexCount,
-    LatexIndentOptions,
-    TexCountOptions
+    TexFmt,
+    TexCountOptions,
+    TexFmtOptions
 } from '../../../src';
 
 import './styles.css';
@@ -33,9 +33,10 @@ class LatexToolsDemo {
     private inputEditor: EditorView;
     private outputView: HTMLElement;
     private runner: WebPerlRunner;
-    private latexIndent: LatexIndent;
+    // private latexIndent: LatexIndent;
     private texCount: TexCount;
-    private currentTool: 'latexindent' | 'texcount' = 'latexindent';
+    private texFmt: TexFmt;
+    private currentTool: 'texcount' | 'texfmt' = 'texfmt';
 
     constructor() {
         this.runner = new WebPerlRunner({
@@ -44,8 +45,9 @@ class LatexToolsDemo {
             verbose: true
         });
 
-        this.latexIndent = new LatexIndent(this.runner, true);
+        // this.latexIndent = new LatexIndent(this.runner, true);
         this.texCount = new TexCount(this.runner, true);
+        this.texFmt = new TexFmt(true);
 
         this.inputEditor = this.createInputEditor();
         this.outputView = document.getElementById('output-display')!;
@@ -76,7 +78,7 @@ class LatexToolsDemo {
         document.querySelectorAll('input[name="tool"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const target = e.target as HTMLInputElement;
-                this.currentTool = target.value as 'latexindent' | 'texcount';
+                this.currentTool = target.value as 'texcount' | 'texfmt';
                 this.updateToolOptions();
             });
         });
@@ -91,16 +93,13 @@ class LatexToolsDemo {
     }
 
     private updateToolOptions(): void {
-        const latexindentOptions = document.getElementById('latexindent-options')!;
+        // const latexindentOptions = document.getElementById('latexindent-options')!;
         const texcountOptions = document.getElementById('texcount-options')!;
+        const texfmtOptions = document.getElementById('texfmt-options')!;
 
-        if (this.currentTool === 'latexindent') {
-            latexindentOptions.style.display = 'block';
-            texcountOptions.style.display = 'none';
-        } else {
-            latexindentOptions.style.display = 'none';
-            texcountOptions.style.display = 'block';
-        }
+        // latexindentOptions.style.display = this.currentTool === 'latexindent' ? 'block' : 'none';
+        texcountOptions.style.display = this.currentTool === 'texcount' ? 'block' : 'none';
+        texfmtOptions.style.display = this.currentTool === 'texfmt' ? 'block' : 'none';
     }
 
     private async initializeTools(): Promise<void> {
@@ -125,32 +124,14 @@ class LatexToolsDemo {
         this.setStatus(`Running ${this.currentTool}...`, 'info');
 
         try {
-            if (this.currentTool === 'latexindent') {
-                await this.runLatexIndent(input);
-            } else {
+            if (this.currentTool === 'texcount') {
                 await this.runTexCount(input);
+            } else {
+                await this.runTexFmt(input);
             }
         } catch (error) {
             this.setStatus(`Error: ${error}`, 'error');
             this.displayOutput(`Error: ${error}`, true);
-        }
-    }
-
-    private async runLatexIndent(input: string): Promise<void> {
-        const options: LatexIndentOptions = {
-            input,
-            silent: (document.getElementById('silent') as HTMLInputElement).checked,
-            overwrite: (document.getElementById('overwrite') as HTMLInputElement).checked
-        };
-
-        const result = await this.latexIndent.format(options);
-
-        if (result.success) {
-            this.displayOutput(result.output, false);
-            this.setStatus('Formatting completed', 'success');
-        } else {
-            this.displayOutput(result.error || 'Unknown error', true);
-            this.setStatus('Formatting failed', 'error');
         }
     }
 
@@ -172,6 +153,26 @@ class LatexToolsDemo {
         } else {
             this.displayOutput(result.error || 'Unknown error', true);
             this.setStatus('Counting failed', 'error');
+        }
+    }
+
+    private async runTexFmt(input: string): Promise<void> {
+        const options: TexFmtOptions = {
+            input,
+            wrap: (document.getElementById('wrap') as HTMLInputElement).checked,
+            wraplen: parseInt((document.getElementById('wraplen') as HTMLInputElement).value, 10),
+            tabsize: parseInt((document.getElementById('tabsize-fmt') as HTMLInputElement).value, 10),
+            usetabs: (document.getElementById('usetabs') as HTMLInputElement).checked
+        };
+
+        const result = await this.texFmt.format(options);
+
+        if (result.success) {
+            this.displayOutput(result.output, false);
+            this.setStatus('Formatting completed', 'success');
+        } else {
+            this.displayOutput(result.error || 'Unknown error', true);
+            this.setStatus('Formatting failed', 'error');
         }
     }
 
