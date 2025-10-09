@@ -18,6 +18,24 @@
 #
 #	For all communication, please visit: https://github.com/cmhughes/latexindent.pl
 
+# Begin monkeypatch: Added shim to fool Encoder into discovering Storable as existant
+BEGIN {
+    package Storable;
+    our $VERSION = '0';
+    sub dclone {
+        my ($x) = @_;
+        return $x unless ref $x;
+        return [ map dclone($_), @$x ] if ref $x eq 'ARRAY';
+        return { map { $_ => dclone($x->{$_}) } keys %$x } if ref $x eq 'HASH';
+        if (ref $x eq 'SCALAR' or ref $x eq 'REF') {
+            my $v = dclone($$x); return \$v;
+        }
+        return $x; # other ref types: return as-is
+    }
+    $INC{'Storable.pm'} = __FILE__;
+}
+## End monkeypatch
+
 use strict;
 use warnings;
 use FindBin;         # help find defaultSettings.yaml

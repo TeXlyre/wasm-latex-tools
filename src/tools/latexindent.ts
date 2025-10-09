@@ -8,6 +8,11 @@ export class LatexIndent extends BaseTool {
 
     getDependencyPaths(): string[] {
         return [
+            '/File/Which.pm',
+            '/File/HomeDir.pm',
+            '/File/HomeDir/Driver.pm',
+            '/File/HomeDir/Unix.pm',
+            '/YAML/Tiny.pm',
             '/LatexIndent/AlignmentAtAmpersand.pm',
             '/LatexIndent/Arguments.pm',
             '/LatexIndent/BackUpFileProcedure.pm',

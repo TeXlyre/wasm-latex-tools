@@ -1,11 +1,15 @@
+// base-tool.ts (new)
 import { WebPerlRunner } from '../core/webperl-runner';
 import { ScriptResult, ScriptRunOptions } from '../core/types';
 import { Logger } from '../utils/logger';
 
+type VfsInput = { fn: string; text: string };
+
 export abstract class BaseTool {
     protected runner: WebPerlRunner;
     protected logger: Logger;
-    private scriptContent: string | null = null;
+    private filesLoaded = false;
+    private preloadedFiles: VfsInput[] = []; // ⬅ cache files instead of writing via Perl
 
     constructor(runner: WebPerlRunner, verbose: boolean = false) {
         this.runner = runner;
@@ -13,55 +17,57 @@ export abstract class BaseTool {
     }
 
     abstract getScriptPath(): string;
+    abstract getDependencyPaths(): string[];
 
     protected async ensureLoaded(): Promise<void> {
         if (!this.runner.isInitialized()) {
             await this.runner.initialize();
         }
-
-        if (!this.scriptContent) {
-            await this.loadScriptContent();
+        if (!this.filesLoaded) {
+            await this.fetchAllFiles();     // ⬅ just fetch & cache
+            this.filesLoaded = true;
         }
     }
 
-    private async loadScriptContent(): Promise<void> {
-        const scriptPath = this.getScriptPath();
+    private async fetchAllFiles(): Promise<void> {
         const config = this.runner.getConfig();
-        const scriptUrl = `${config.perlScriptsPath}${scriptPath}`;
+        const filesToLoad = [
+            { path: this.getScriptPath(), virtual: this.getScriptPath() },
+            ...this.getDependencyPaths().map(path => ({ path, virtual: path })),
+        ];
 
-        this.logger.debug(`Loading Perl script from ${scriptUrl}`);
-
-        try {
-            const response = await fetch(scriptUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const inputs: VfsInput[] = [];
+        for (const file of filesToLoad) {
+            const url = `${config.perlScriptsPath}${file.path}`;
+            this.logger.debug(`Fetching file from ${url}`);
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+                const content = await resp.text();
+                inputs.push({ fn: file.virtual, text: content });
+                this.logger.debug(`Fetched: ${file.path}`);
+            } catch (err) {
+                throw new Error(`Failed to load file ${file.path}: ${err}`);
             }
-
-            this.scriptContent = await response.text();
-            this.logger.debug(`Script loaded: ${scriptPath}`);
-        } catch (error) {
-            throw new Error(`Failed to load script ${scriptPath}: ${error}`);
         }
+        this.preloadedFiles = inputs; // ⬅ keep in memory
     }
 
     protected async executeScript(options: ScriptRunOptions): Promise<ScriptResult> {
         await this.ensureLoaded();
 
-        const timestamp = Date.now();
-        const inputPath = `/tmp/input_${timestamp}.tex`;
-        const outputPath = `/tmp/output_${timestamp}.tex`;
-        const scriptPath = `/tmp/script_${timestamp}.pl`;
+        const t = Date.now();
+        const inputPath = `/tmp/input_${t}.tex`;
+        const outputPath = `/tmp/output_${t}.tex`;
 
         const args = this.buildArguments(inputPath, outputPath, options);
 
+        // ⬅ SINGLE run: write all deps + main script + this run’s input
         const inputs = [
+            ...this.preloadedFiles,
             { fn: inputPath, text: options.input },
-            { fn: scriptPath, text: this.scriptContent! }
         ];
         const outputs = [outputPath];
-
-        // Update first arg to use the temp script path
-        args[0] = scriptPath;
 
         return this.runner.runScript(args, inputs, outputs);
     }
