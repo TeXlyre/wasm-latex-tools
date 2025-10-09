@@ -24,6 +24,10 @@
                     <input type="radio" name="tool" value="texcount">
                     TeX Count (WebPerl WASM)
                 </label>
+                <label>
+                    <input type="radio" name="tool" value="latexdiff">
+                    LaTeX Diff (WebPerl)
+                </label>
             </div>
 
             <div class="tool-options" id="texfmt-options">
@@ -43,23 +47,18 @@
 
             <div class="tool-options" id="texcount-options" style="display: none;">
                 <label>
-                    <input type="checkbox" id="brief" checked> Brief
+                    <input type="checkbox" id="brief"> Brief
                 </label>
                 <label>
                     <input type="checkbox" id="total"> Total
                 </label>
                 <label>
-                    <input type="checkbox" id="sum"> Sum
+                    <input type="checkbox" id="sum" checked> Sum
                 </label>
                 <label>
                     Verbosity: <input type="number" id="verbose" min="0" max="4" value="0">
                 </label>
             </div>
-
-            <label>
-                <input type="radio" name="tool" value="latexdiff">
-                LaTeX Diff (WebPerl)
-            </label>
 
             <div class="tool-options" id="latexdiff-options" style="display: none;">
                 <label>
