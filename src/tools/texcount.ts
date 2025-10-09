@@ -2,15 +2,11 @@ import { BaseTool } from './base-tool';
 import { TexCountOptions, ScriptResult, ScriptRunOptions } from '../core/types';
 
 export class TexCount extends BaseTool {
-    getScriptName(): string {
-        return 'texcount';
-    }
-
     getScriptPath(): string {
         return '/texcount.pl';
     }
 
-    getDependencies(): string[] {
+    getDependencyPaths(): string[] {
         return [];
     }
 
@@ -24,7 +20,7 @@ export class TexCount extends BaseTool {
         options: ScriptRunOptions
     ): string[] {
         const texOptions = options as TexCountOptions;
-        const scriptPath = `/perl${this.getScriptPath()}`;
+        const scriptPath = this.getScriptPath();
 
         const args = [scriptPath];
 

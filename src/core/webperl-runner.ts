@@ -1,4 +1,4 @@
-import { WebPerlConfig, ScriptResult, PerlInstance } from './types';
+import { WebPerlConfig, ScriptResult } from './types';
 import { Logger } from '../utils/logger';
 import { ErrorHandler } from '../utils/error-handler';
 
@@ -8,6 +8,7 @@ export class WebPerlRunner {
     private initialized: boolean = false;
     private initializing: boolean = false;
     private perlRunnerIframe: HTMLIFrameElement | null = null;
+    private perlRunner: Window | null = null;
 
     constructor(config: WebPerlConfig = {}) {
         this.config = {
@@ -52,10 +53,9 @@ export class WebPerlRunner {
                 if (data.perlRunnerState === 'Ready') {
                     clearTimeout(timeout);
                     window.removeEventListener('message', messageHandler);
+                    this.perlRunner = event.source as Window;
                     this.logger.debug('Perl runner is ready');
                     resolve();
-                } else if (data.perlRunnerError) {
-                    this.logger.error('Perl runner error:', data.perlRunnerError);
                 }
             };
 
@@ -65,7 +65,6 @@ export class WebPerlRunner {
             this.perlRunnerIframe.name = 'perlrunner';
             this.perlRunnerIframe.src = `${this.config.webperlBasePath}/perlrunner.html`;
             this.perlRunnerIframe.style.display = 'none';
-            this.perlRunnerIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
 
             this.perlRunnerIframe.onerror = () => {
                 clearTimeout(timeout);
@@ -74,6 +73,18 @@ export class WebPerlRunner {
             };
 
             document.body.appendChild(this.perlRunnerIframe);
+
+            const pollForRunner = setInterval(() => {
+                const runnerFrame = this.perlRunnerIframe?.contentWindow;
+                if (runnerFrame) {
+                    runnerFrame.postMessage(
+                        { perlRunnerDiscovery: 1 },
+                        '*'
+                    );
+                }
+            }, 100);
+
+            setTimeout(() => clearInterval(pollForRunner), 30000);
         });
     }
 
@@ -86,14 +97,13 @@ export class WebPerlRunner {
         }
     }
 
-    async runScript(scriptPath: string, args: string[] = []): Promise<ScriptResult> {
-        if (!this.initialized || !this.perlRunnerIframe) {
+    async runScript(
+        argv: string[],
+        inputs?: { fn: string; text: string }[],
+        outputs?: string[]
+    ): Promise<ScriptResult> {
+        if (!this.initialized || !this.perlRunner) {
             throw new Error('WebPerl not initialized. Call initialize() first.');
-        }
-
-        const contentWindow = this.perlRunnerIframe.contentWindow;
-        if (!contentWindow) {
-            throw new Error('Perl runner iframe not ready');
         }
 
         return new Promise((resolve, reject) => {
@@ -138,14 +148,17 @@ export class WebPerlRunner {
 
             window.addEventListener('message', messageHandler);
 
-            const runData = {
-                argv: ['-e', `do '${scriptPath}'`, '--', ...args]
-            };
+            const runData: any = { argv };
+            if (inputs) runData.inputs = inputs;
+            if (outputs) runData.outputs = outputs;
 
-            contentWindow.postMessage(
-                { runPerl: runData },
-                '*'
-            );
+            if (!this.perlRunner) {
+                window.removeEventListener('message', messageHandler);
+                reject(new Error('Perl runner not available'));
+                return;
+            }
+
+            this.perlRunner.postMessage({ runPerl: runData }, '*');
 
             setTimeout(() => {
                 window.removeEventListener('message', messageHandler);
