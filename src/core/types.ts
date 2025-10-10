@@ -26,7 +26,8 @@ export interface PerlScript {
 export enum ToolType {
     LATEXINDENT = 'latexindent',
     TEXCOUNT = 'texcount',
-    TEXFMT = 'texfmt'
+    TEXFMT = 'texfmt',
+    LATEXPAND = 'latexpand'
 }
 
 export interface TexFmtOptions extends ScriptRunOptions {
@@ -59,6 +60,22 @@ export interface LatexDiffOptions extends ScriptRunOptions {
     mathMarkup?: number;
     allowSpaces?: boolean;
     flatten?: boolean;
+}
+
+export interface LatexpandOptions extends ScriptRunOptions {
+    keepComments?: boolean;
+    keepIncludes?: boolean;
+    emptyComments?: boolean;
+    defines?: Record<string, string>;
+    explain?: boolean;
+    showGraphics?: boolean;
+    graphicsExtensions?: string;
+    expandUsepackage?: boolean;
+    expandBbl?: string;
+    biber?: string;
+    fatal?: boolean;
+    makeatletter?: boolean;
+    additionalFiles?: { path: string; content: string }[];
 }
 
 export interface EmscriptenFS {

@@ -28,6 +28,10 @@
                     <input type="radio" name="tool" value="latexdiff">
                     LaTeX Diff (WebPerl WASM)
                 </label>
+                <label>
+                    <input type="radio" name="tool" value="latexpand">
+                    LaTeX Expand (WebPerl WASM)
+                </label>
             </div>
 
             <div class="tool-options" id="texfmt-options">
@@ -93,6 +97,31 @@
                         <option value="CFONT">Color Font</option>
                         <option value="CHANGEBAR">Change Bar</option>
                     </select>
+                </label>
+            </div>
+
+            <div class="tool-options" id="latexpand-options" style="display: none;">
+                <label>
+                    Main file:
+                    <select id="expand-file"></select>
+                </label>
+                <label>
+                    <input type="checkbox" id="keep-comments"> Keep comments
+                </label>
+                <label>
+                    <input type="checkbox" id="empty-comments"> Empty comments
+                </label>
+                <label>
+                    <input type="checkbox" id="expand-usepackage"> Expand usepackage
+                </label>
+                <label>
+                    <input type="checkbox" id="makeatletter"> Makeatletter
+                </label>
+                <label>
+                    <input type="checkbox" id="show-graphics"> Show graphics
+                </label>
+                <label>
+                    <input type="checkbox" id="fatal"> Fatal on error
                 </label>
             </div>
 

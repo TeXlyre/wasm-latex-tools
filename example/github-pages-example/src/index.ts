@@ -8,9 +8,11 @@ import {
     TexCount,
     TexFmt,
     LatexDiff,
+    Latexpand,
     TexCountOptions,
     TexFmtOptions,
-    LatexDiffOptions
+    LatexDiffOptions,
+    LatexpandOptions
 } from '../../../src';
 
 import './styles.css';
@@ -71,7 +73,8 @@ class LatexToolsDemo {
     private texCount: TexCount;
     private texFmt: TexFmt;
     private latexDiff: LatexDiff;
-    private currentTool: 'texcount' | 'texfmt' | 'latexdiff' = 'texfmt';
+    private latexpand: Latexpand;
+    private currentTool: 'texcount' | 'texfmt' | 'latexdiff' | 'latexpand' = 'texfmt';
     private files: Map<string, FileTab> = new Map();
     private activeFile: string = 'main.tex';
 
@@ -85,6 +88,7 @@ class LatexToolsDemo {
         this.texCount = new TexCount(this.runner, true);
         this.texFmt = new TexFmt(true);
         this.latexDiff = new LatexDiff(this.runner, true);
+        this.latexpand = new Latexpand(this.runner, true);
 
         this.files.set('main.tex', {
             name: 'main.tex',
@@ -122,7 +126,7 @@ class LatexToolsDemo {
         document.querySelectorAll('input[name="tool"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const target = e.target as HTMLInputElement;
-                this.currentTool = target.value as 'texcount' | 'texfmt' | 'latexdiff';
+                this.currentTool = target.value as 'texcount' | 'texfmt' | 'latexdiff' | 'latexpand';
                 this.updateToolOptions();
             });
         });
@@ -177,6 +181,8 @@ class LatexToolsDemo {
             this.updateFmtFileSelector();
         } else if (this.currentTool === 'texcount') {
             this.updateCountFileSelector();
+        } else if (this.currentTool === 'latexpand') {
+            this.updateExpandFileSelector();
         }
     }
 
@@ -342,10 +348,12 @@ Further research is needed to validate these results.`,
         const texcountOptions = document.getElementById('texcount-options')!;
         const texfmtOptions = document.getElementById('texfmt-options')!;
         const latexdiffOptions = document.getElementById('latexdiff-options')!;
+        const latexpandOptions = document.getElementById('latexpand-options')!;
 
         texcountOptions.style.display = this.currentTool === 'texcount' ? 'block' : 'none';
         texfmtOptions.style.display = this.currentTool === 'texfmt' ? 'block' : 'none';
         latexdiffOptions.style.display = this.currentTool === 'latexdiff' ? 'block' : 'none';
+        latexpandOptions.style.display = this.currentTool === 'latexpand' ? 'block' : 'none';
 
         if (this.currentTool === 'latexdiff') {
             this.updateDiffFileSelectors();
@@ -353,6 +361,8 @@ Further research is needed to validate these results.`,
             this.updateFmtFileSelector();
         } else if (this.currentTool === 'texcount') {
             this.updateCountFileSelector();
+        } else if (this.currentTool === 'latexpand') {
+            this.updateExpandFileSelector();
         }
     }
 
@@ -409,6 +419,20 @@ Further research is needed to validate these results.`,
         countFileSelect.value = 'main.tex';
     }
 
+    private updateExpandFileSelector(): void {
+        const expandFileSelect = document.getElementById('expand-file') as HTMLSelectElement;
+        expandFileSelect.innerHTML = '';
+
+        this.files.forEach((file, filename) => {
+            const option = document.createElement('option');
+            option.value = filename;
+            option.textContent = filename;
+            expandFileSelect.appendChild(option);
+        });
+
+        expandFileSelect.value = 'main.tex';
+    }
+
     private async initializeTools(): Promise<void> {
         this.setStatus('Initializing WebPerl...', 'info');
 
@@ -430,6 +454,8 @@ Further research is needed to validate these results.`,
                 await this.runTexCount('');
             } else if (this.currentTool === 'latexdiff') {
                 await this.runLatexDiff('');
+            } else if (this.currentTool === 'latexpand') {
+                await this.runLatexpand('');
             } else {
                 await this.runTexFmt('');
             }
@@ -579,6 +605,54 @@ Further research is needed to validate these results.`,
         } else {
             this.displayOutput(result.error || 'Unknown error', true);
             this.setStatus('Diff failed', 'error');
+        }
+    }
+
+    private async runLatexpand(input: string): Promise<void> {
+        const expandFileSelect = document.getElementById('expand-file') as HTMLSelectElement;
+        const selectedFilename = expandFileSelect.value;
+        const selectedFile = this.files.get(selectedFilename);
+
+        if (!selectedFile || !selectedFile.content.trim()) {
+            this.setStatus('Please select a valid file', 'warning');
+            return;
+        }
+
+        const options: LatexpandOptions = {
+            input: selectedFile.content,
+            keepComments: (document.getElementById('keep-comments') as HTMLInputElement).checked,
+            emptyComments: (document.getElementById('empty-comments') as HTMLInputElement).checked,
+            expandUsepackage: (document.getElementById('expand-usepackage') as HTMLInputElement).checked,
+            makeatletter: (document.getElementById('makeatletter') as HTMLInputElement).checked,
+            showGraphics: (document.getElementById('show-graphics') as HTMLInputElement).checked,
+            fatal: (document.getElementById('fatal') as HTMLInputElement).checked
+        };
+
+        const additionalFiles = this.extractIncludedFiles(selectedFile.content);
+        if (additionalFiles.length > 0) {
+            options.additionalFiles = additionalFiles;
+            const fileList = additionalFiles.map(f => f.path).join(', ');
+            this.setStatus(`Expanding with ${additionalFiles.length} included file(s): ${fileList}`, 'info');
+        }
+
+        console.log('Latexpand options:', options);
+        console.log('Additional files:', additionalFiles);
+
+        const result = await this.latexpand.expand(options);
+
+        console.log('Latexpand result:', result);
+
+        if (result.success) {
+            if (result.output && result.output.trim()) {
+                this.displayOutput(result.output, false);
+                this.setStatus('Expansion completed', 'success');
+            } else {
+                this.displayOutput('Warning: Expansion completed but produced no output.\n\n' + (result.error || ''), true);
+                this.setStatus('Expansion completed with warnings', 'warning');
+            }
+        } else {
+            this.displayOutput(result.error || 'Unknown error', true);
+            this.setStatus('Expansion failed', 'error');
         }
     }
 
