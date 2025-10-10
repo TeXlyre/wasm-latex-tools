@@ -1,5 +1,9 @@
 #! /usr/bin/env perl
-# Begin monkeypatch: Added shim to fool Encoder into discovering Storable as existant
+# The package, i.e. the script and all accompanying files, is distributed under the LaTeX Project Public License.
+# Maintained by Andreas Einer at https://github.com/EinarAndreas/TeXcount. 
+# Patched by Fares Abawi <fares@abawi.me> (https://abawi.me).
+
+# Begin monkeypatch (fabawi): Added shim to fool Encoder into discovering Storable as existant
 BEGIN {
     package Storable;
     our $VERSION = '0';
@@ -16,6 +20,7 @@ BEGIN {
     $INC{'Storable.pm'} = __FILE__;
 }
 ## End monkeypatch
+
 use strict;
 use warnings;
 use utf8; # Because the script itself is UTF-8 encoded
