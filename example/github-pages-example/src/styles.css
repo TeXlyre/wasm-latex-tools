@@ -22,7 +22,8 @@ body {
     background-color: var(--bg-color);
 }
 
-header {
+header,
+footer {
     background: linear-gradient(135deg, var(--primary-color), #fac491);
     color: white;
     padding: 2rem;
@@ -34,10 +35,52 @@ header h1 {
     margin-bottom: 0.5rem;
 }
 
+footer {
+    margin-top: 2rem;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+footer p {
+    color: white;
+}
+
+.links {
+    margin-top: 1rem;
+}
+
+.links a {
+    color: white;
+    margin: 0 0.5rem;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid white;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.links a:hover {
+    background-color: white;
+    color: var(--primary-color);
+}
+
 main {
     max-width: 1400px;
     margin: 2rem auto;
     padding: 0 1rem;
+}
+
+section {
+    margin-bottom: 3rem;
+    background-color: var(--card-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    padding: 2rem;
+}
+
+h1,
+h2 {
+    margin-top: 0;
 }
 
 .controls {
@@ -81,6 +124,22 @@ main {
 
 .tool-options input[type="checkbox"] {
     flex-shrink: 0;
+}
+
+code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+ul {
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+.features li::marker {
+    color: var(--primary-color);
 }
 
 button {

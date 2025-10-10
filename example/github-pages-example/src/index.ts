@@ -80,8 +80,8 @@ class LatexToolsDemo {
 
     constructor() {
         this.runner = new WebPerlRunner({
-            webperlBasePath: '/webperl',
-            perlScriptsPath: '/perl',
+            webperlBasePath: '/core/webperl',
+            perlScriptsPath: '/core/perl',
             verbose: true
         });
 
