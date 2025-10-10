@@ -45,6 +45,9 @@ export class TexFmt {
             config.push(`tabchar = "${options.usetabs ? 'tab' : 'space'}"`);
         }
 
+        config.push('lists = []');
+        config.push('no-indent-envs = []');
+
         return config.join('\n');
     }
 

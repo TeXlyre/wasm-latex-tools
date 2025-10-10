@@ -15,50 +15,16 @@ import {
     LatexpandOptions
 } from '../../../src';
 
+import {
+    sampleLatex,
+    multiFileSample,
+    introductionSample,
+    methodsSample,
+    resultsSample,
+    referencesSample
+} from './samples';
+
 import './styles.css';
-
-const sampleLatex = `\\documentclass{article}
-\\usepackage{amsmath}
-
-\\begin{document}
-
-\\section{Introduction}
-This is a sample LaTeX document.
-
-\\subsection{Math Example}
-Here is an equation:
-\\begin{equation}
-E = mc^2
-\\end{equation}
-
-\\end{document}`;
-
-const multiFileSample = `\\documentclass{article}
-\\usepackage{amsmath}
-
-\\title{Multi-File Document Example}
-\\author{Demo Author}
-
-\\begin{document}
-
-\\maketitle
-
-\\input{introduction.tex}
-
-\\input{methods.tex}
-
-\\section{Results}
-The results are shown in the following sections.
-
-\\input{results.tex}
-
-\\section{Conclusion}
-This demonstrates multi-file word counting.
-
-\\bibliographystyle{plain}
-\\bibliography{references}
-
-\\end{document}`;
 
 interface FileTab {
     name: string;
@@ -139,8 +105,10 @@ class LatexToolsDemo {
             this.clearOutput();
         });
 
-        document.getElementById('load-multifile-example')!.addEventListener('click', () => {
-            this.loadMultiFileExample();
+        document.querySelectorAll('.load-multifile-example').forEach(button => {
+            button.addEventListener('click', () => {
+                this.loadMultiFileExample();
+            });
         });
 
         document.getElementById('add-file-btn')!.addEventListener('click', () => {
@@ -273,59 +241,25 @@ class LatexToolsDemo {
 
         this.files.set('introduction.tex', {
             name: 'introduction.tex',
-            content: `\\section{Introduction}
-LaTeX is a document preparation system for high-quality typesetting.
-It is most often used for medium-to-large technical or scientific documents.
-
-\\subsection{Background}
-This section provides background information about the topic.
-The content here demonstrates how included files are counted separately.`,
+            content: introductionSample,
             isMain: false
         });
 
         this.files.set('methods.tex', {
             name: 'methods.tex',
-            content: `\\section{Methods}
-This section describes the methodology used in the research.
-
-\\subsection{Experimental Setup}
-We designed a controlled experiment with the following parameters.
-Multiple measurements were taken to ensure accuracy.
-
-\\subsection{Data Collection}
-Data was collected over a period of six months using automated tools.`,
+            content: methodsSample,
             isMain: false
         });
 
         this.files.set('results.tex', {
             name: 'results.tex',
-            content: `\\subsection{Statistical Analysis}
-The results show a significant correlation between variables.
-Table 1 summarizes the key findings from our analysis.
-
-\\subsection{Discussion}
-These findings suggest that the hypothesis is supported by the data.
-Further research is needed to validate these results.`,
+            content: resultsSample,
             isMain: false
         });
 
         this.files.set('references.bib', {
             name: 'references.bib',
-            content: `@article{sample2023,
-  title={Sample Article Title},
-  author={Author, John and Writer, Jane},
-  journal={Journal of Examples},
-  volume={42},
-  pages={123--145},
-  year={2023}
-}
-
-@book{example2022,
-  title={Example Book on Documentation},
-  author={Editor, Alice},
-  publisher={Academic Press},
-  year={2022}
-}`,
+            content: referencesSample,
             isMain: false
         });
 

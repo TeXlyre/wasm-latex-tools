@@ -31,15 +31,15 @@
                     </label>
                     <label>
                         <input type="radio" name="tool" value="texcount">
-                        TeX Count (WebPerl WASM)
+                        TeXcount (WebPerl WASM)
                     </label>
                     <label>
                         <input type="radio" name="tool" value="latexdiff">
-                        LaTeX Diff (WebPerl WASM)
+                        Latexdiff (WebPerl WASM)
                     </label>
                     <label>
                         <input type="radio" name="tool" value="latexpand">
-                        LaTeX Expand (WebPerl WASM)
+                        Latexpand (WebPerl WASM)
                     </label>
                 </div>
 
@@ -85,7 +85,7 @@
                     <label>
                         <input type="checkbox" id="merge"> Merge counts
                     </label>
-                    <button type="button" id="load-multifile-example" class="secondary-button">Load Multi-File
+                    <button type="button" class="load-multifile-example secondary-button">Load Multi-File
                         Example</button>
                 </div>
 
@@ -115,7 +115,7 @@
                         <select id="expand-file"></select>
                     </label>
                     <label>
-                        <input type="checkbox" id="keep-comments"> Keep comments
+                        <input type="checkbox" id="keep-comments" checked> Keep comments
                     </label>
                     <label>
                         <input type="checkbox" id="empty-comments"> Empty comments
@@ -132,6 +132,8 @@
                     <label>
                         <input type="checkbox" id="fatal"> Fatal on error
                     </label>
+                    <button type="button" class="load-multifile-example secondary-button">Load Multi-File
+                        Example</button>
                 </div>
 
                 <button id="run-tool" class="primary-button">Run Tool</button>
@@ -160,8 +162,8 @@
         <section class="features">
             <h2>Features</h2>
             <ul>
-                <li><strong>TexCount</strong>: Count words in LaTeX documents with multi-file support</li>
-                <li><strong>LaTeX Diff</strong>: Generate diff documents showing changes between files</li>
+                <li><strong>TeXcount</strong>: Count words in LaTeX documents with multi-file support</li>
+                <li><strong>Latexdiff</strong>: Generate diff documents showing changes between files</li>
                 <li><strong>Latexpand</strong>: Expand LaTeX documents by inlining included files</li>
                 <li><strong>TeX-Fmt</strong>: Format and beautify LaTeX documents using (wasm-bindgen)</li>
                 <li>All tools run entirely in the browser with no server required</li>

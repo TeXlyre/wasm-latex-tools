@@ -330,11 +330,12 @@ button:not(.primary-button):not(.icon-button):not(.close-tab):not(.secondary-but
 }
 
 pre {
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    background-color: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
     font-size: 0.9rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
 }
 
 .error-output {
