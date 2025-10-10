@@ -58,6 +58,14 @@
                 <label>
                     Verbosity: <input type="number" id="verbose" min="0" max="4" value="0">
                 </label>
+                <label>
+                    <input type="checkbox" id="include-files"> Include referenced files
+                </label>
+                <label>
+                    <input type="checkbox" id="merge"> Merge counts
+                </label>
+                <button type="button" id="load-multifile-example" class="secondary-button">Load Multi-File
+                    Example</button>
             </div>
 
             <div class="tool-options" id="latexdiff-options" style="display: none;">
@@ -78,7 +86,11 @@
 
         <div class="editors">
             <div class="editor-panel">
-                <h3>Input</h3>
+                <div class="editor-header">
+                    <h3>Input</h3>
+                    <div id="file-tabs" class="file-tabs"></div>
+                    <button type="button" id="add-file-btn" class="icon-button" title="Add file">+</button>
+                </div>
                 <div id="input-editor"></div>
             </div>
 

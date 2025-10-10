@@ -41,6 +41,9 @@ export interface TexCountOptions extends ScriptRunOptions {
     total?: boolean;
     sum?: boolean;
     verbose?: number;
+    includeFiles?: boolean;
+    merge?: boolean;
+    additionalFiles?: { path: string; content: string }[];
 }
 
 export interface LatexDiffOptions extends ScriptRunOptions {

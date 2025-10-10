@@ -148,6 +148,14 @@
                         saveFile(inp.fn, inp.text);
                     });
                 }
+                if (rp["cwd"]) {
+                    try {
+                        ensureDirectory(rp.cwd + '/dummy');
+                        FS.chdir(rp.cwd);
+                    } catch (e) {
+                        reportErr("couldn't change directory to " + rp.cwd + " because " + e);
+                    }
+                }
                 curOutputFiles = rp["outputs"];
                 Perl.start(rp["argv"] ? rp.argv : []);
             } else {

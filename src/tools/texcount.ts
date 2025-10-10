@@ -11,7 +11,34 @@ export class TexCount extends BaseTool {
     }
 
     async count(options: TexCountOptions): Promise<ScriptResult> {
-        return this.executeScript(options);
+        return this.executeScriptWithWorkDir(options);
+    }
+
+    private async executeScriptWithWorkDir(options: TexCountOptions): Promise<ScriptResult> {
+        await this.ensureLoaded();
+
+        const t = Date.now();
+        const workDir = `/tmp/work_${t}`;
+        const inputPath = `${workDir}/main.tex`;
+        const outputPath = `/tmp/output_${t}.tex`;
+
+        const args = this.buildArguments('main.tex', "", outputPath, options);
+
+        const inputs = [
+            ...this.preloadedFiles,
+            { fn: inputPath, text: options.input },
+        ];
+
+        if (options.additionalFiles) {
+            for (const file of options.additionalFiles) {
+                const fullPath = `${workDir}/${file.path}`;
+                inputs.push({ fn: fullPath, text: file.content });
+            }
+        }
+
+        const outputs = [outputPath];
+
+        return this.runner.runScript(args, inputs, outputs, workDir);
     }
 
     protected buildArguments(
@@ -29,6 +56,8 @@ export class TexCount extends BaseTool {
         if (texOptions.total) args.push('-total');
         if (texOptions.sum) args.push('-sum');
         if (texOptions.verbose !== undefined) args.push(`-v${texOptions.verbose}`);
+        if (texOptions.includeFiles) args.push('-inc');
+        if (texOptions.merge) args.push('-merge');
         if (texOptions.args) args.push(...texOptions.args);
 
         args.push(inputPath);

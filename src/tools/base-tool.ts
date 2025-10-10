@@ -1,4 +1,3 @@
-// base-tool.ts (new)
 import { WebPerlRunner } from '../core/webperl-runner';
 import { ScriptResult, ScriptRunOptions, LatexDiffOptions } from '../core/types';
 import { Logger } from '../utils/logger';
@@ -9,7 +8,7 @@ export abstract class BaseTool {
     protected runner: WebPerlRunner;
     protected logger: Logger;
     private filesLoaded = false;
-    public preloadedFiles: VfsInput[] = []; // ⬅ cache files instead of writing via Perl
+    public preloadedFiles: VfsInput[] = [];
 
     constructor(runner: WebPerlRunner, verbose: boolean = false) {
         this.runner = runner;
@@ -24,7 +23,7 @@ export abstract class BaseTool {
             await this.runner.initialize();
         }
         if (!this.filesLoaded) {
-            await this.fetchAllFiles();     // ⬅ just fetch & cache
+            await this.fetchAllFiles();
             this.filesLoaded = true;
         }
     }
@@ -50,8 +49,9 @@ export abstract class BaseTool {
                 throw new Error(`Failed to load file ${file.path}: ${err}`);
             }
         }
-        this.preloadedFiles = inputs; // ⬅ keep in memory
+        this.preloadedFiles = inputs;
     }
+
     protected async executeLatexDiff(options: LatexDiffOptions): Promise<ScriptResult> {
         await this.ensureLoaded();
 
@@ -81,7 +81,6 @@ export abstract class BaseTool {
 
         const args = this.buildArguments(inputPath, "", outputPath, options);
 
-        // ⬅ SINGLE run: write all deps + main script + this run’s input
         const inputs = [
             ...this.preloadedFiles,
             { fn: inputPath, text: options.input },

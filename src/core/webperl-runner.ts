@@ -100,11 +100,14 @@ export class WebPerlRunner {
     async runScript(
         argv: string[],
         inputs?: { fn: string; text: string }[],
-        outputs?: string[]
+        outputs?: string[],
+        workingDir?: string
     ): Promise<ScriptResult> {
         if (!this.initialized || !this.perlRunner) {
             throw new Error('WebPerl not initialized. Call initialize() first.');
         }
+
+        const sortedInputs = this.sortInputsByDepth(inputs || []);
 
         return new Promise((resolve, reject) => {
             let stdout = '';
@@ -149,8 +152,9 @@ export class WebPerlRunner {
             window.addEventListener('message', messageHandler);
 
             const runData: any = { argv };
-            if (inputs) runData.inputs = inputs;
+            if (sortedInputs.length > 0) runData.inputs = sortedInputs;
             if (outputs) runData.outputs = outputs;
+            if (workingDir) runData.cwd = workingDir;
 
             if (!this.perlRunner) {
                 window.removeEventListener('message', messageHandler);
@@ -164,6 +168,14 @@ export class WebPerlRunner {
                 window.removeEventListener('message', messageHandler);
                 reject(new Error('Timeout waiting for script execution'));
             }, 60000);
+        });
+    }
+
+    private sortInputsByDepth(inputs: { fn: string; text: string }[]): { fn: string; text: string }[] {
+        return inputs.slice().sort((a, b) => {
+            const depthA = a.fn.split('/').length;
+            const depthB = b.fn.split('/').length;
+            return depthA - depthB;
         });
     }
 
