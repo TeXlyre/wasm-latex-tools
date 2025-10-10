@@ -12,8 +12,8 @@ export class WebPerlRunner {
 
     constructor(config: WebPerlConfig = {}) {
         this.config = {
-            webperlBasePath: config.webperlBasePath || '/webperl',
-            perlScriptsPath: config.perlScriptsPath || '/perl',
+            webperlBasePath: config.webperlBasePath || '/core/webperl',
+            perlScriptsPath: config.perlScriptsPath || '/core/perl',
             verbose: config.verbose ?? false
         };
         this.logger = new Logger(this.config.verbose);

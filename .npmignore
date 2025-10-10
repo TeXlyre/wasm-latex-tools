@@ -1,0 +1,14 @@
+# Don't ignore assets in npm package (needed by users!)
+!assets/
+
+node_modules/
+src/
+example/
+public/
+tsconfig.json
+rollup.config.js
+scripts/copy-webperl.cjs
+.github/
+.gitignore
+*.log
+.DS_Store

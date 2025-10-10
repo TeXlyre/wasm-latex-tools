@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Run LaTeX tools in your browser using WebAssembly">
     <title>WASM LaTeX Tools Demo</title>
 </head>
 
@@ -11,145 +12,187 @@
     <header>
         <h1>WASM LaTeX Tools</h1>
         <p>Run LaTeX Perl and Rust tools directly in your browser</p>
+        <div class="links">
+            <a href="https://github.com/TeXlyre/wasm-latex-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.npmjs.com/package/wasm-latex-tools" target="_blank" rel="noopener noreferrer">npm</a>
+        </div>
     </header>
 
     <main>
-        <div class="controls">
-            <div class="tool-selector">
-                <label>
-                    <input type="radio" name="tool" value="texfmt" checked>
-                    TeX-Fmt (Rust WASM)
-                </label>
-                <label>
-                    <input type="radio" name="tool" value="texcount">
-                    TeX Count (WebPerl WASM)
-                </label>
-                <label>
-                    <input type="radio" name="tool" value="latexdiff">
-                    LaTeX Diff (WebPerl WASM)
-                </label>
-                <label>
-                    <input type="radio" name="tool" value="latexpand">
-                    LaTeX Expand (WebPerl WASM)
-                </label>
-            </div>
+        <section class="demo-container">
+            <h2>Interactive Demo</h2>
+            <p>Try out the LaTeX tools below. Select a tool, configure options, and run it on your LaTeX code.</p>
 
-            <div class="tool-options" id="texfmt-options">
-                <label>
-                    File:
-                    <select id="fmt-file"></select>
-                </label>
-                <label>
-                    <input type="checkbox" id="wrap" checked> Wrap lines
-                </label>
-                <label>
-                    Wrap length: <input type="number" id="wraplen" min="40" max="120" value="80">
-                </label>
-                <label>
-                    Tab size: <input type="number" id="tabsize-fmt" min="1" max="8" value="2">
-                </label>
-                <label>
-                    <input type="checkbox" id="usetabs"> Use tabs
-                </label>
-            </div>
-
-            <div class="tool-options" id="texcount-options" style="display: none;">
-                <label>
-                    Main file:
-                    <select id="count-file"></select>
-                </label>
-                <label>
-                    <input type="checkbox" id="brief"> Brief
-                </label>
-                <label>
-                    <input type="checkbox" id="total"> Total
-                </label>
-                <label>
-                    <input type="checkbox" id="sum" checked> Sum
-                </label>
-                <label>
-                    Verbosity: <input type="number" id="verbose" min="0" max="4" value="0">
-                </label>
-                <label>
-                    <input type="checkbox" id="include-files"> Include referenced files
-                </label>
-                <label>
-                    <input type="checkbox" id="merge"> Merge counts
-                </label>
-                <button type="button" id="load-multifile-example" class="secondary-button">Load Multi-File
-                    Example</button>
-            </div>
-
-            <div class="tool-options" id="latexdiff-options" style="display: none;">
-                <label>
-                    Old file:
-                    <select id="diff-old-file"></select>
-                </label>
-                <label>
-                    New file:
-                    <select id="diff-new-file"></select>
-                </label>
-                <label>
-                    Markup type:
-                    <select id="diff-type">
-                        <option value="UNDERLINE" selected>Underline</option>
-                        <option value="CTRADITIONAL">Color Traditional</option>
-                        <option value="CFONT">Color Font</option>
-                        <option value="CHANGEBAR">Change Bar</option>
-                    </select>
-                </label>
-            </div>
-
-            <div class="tool-options" id="latexpand-options" style="display: none;">
-                <label>
-                    Main file:
-                    <select id="expand-file"></select>
-                </label>
-                <label>
-                    <input type="checkbox" id="keep-comments"> Keep comments
-                </label>
-                <label>
-                    <input type="checkbox" id="empty-comments"> Empty comments
-                </label>
-                <label>
-                    <input type="checkbox" id="expand-usepackage"> Expand usepackage
-                </label>
-                <label>
-                    <input type="checkbox" id="makeatletter"> Makeatletter
-                </label>
-                <label>
-                    <input type="checkbox" id="show-graphics"> Show graphics
-                </label>
-                <label>
-                    <input type="checkbox" id="fatal"> Fatal on error
-                </label>
-            </div>
-
-            <button id="run-tool" class="primary-button">Run Tool</button>
-            <button id="clear-output">Clear Output</button>
-        </div>
-
-        <div class="editors">
-            <div class="editor-panel">
-                <div class="editor-header">
-                    <h3>Input</h3>
-                    <div id="file-tabs" class="file-tabs"></div>
-                    <button type="button" id="add-file-btn" class="icon-button" title="Add file">+</button>
+            <div class="controls">
+                <div class="tool-selector">
+                    <label>
+                        <input type="radio" name="tool" value="texfmt" checked>
+                        TeX-Fmt (Rust WASM)
+                    </label>
+                    <label>
+                        <input type="radio" name="tool" value="texcount">
+                        TeX Count (WebPerl WASM)
+                    </label>
+                    <label>
+                        <input type="radio" name="tool" value="latexdiff">
+                        LaTeX Diff (WebPerl WASM)
+                    </label>
+                    <label>
+                        <input type="radio" name="tool" value="latexpand">
+                        LaTeX Expand (WebPerl WASM)
+                    </label>
                 </div>
-                <div id="input-editor"></div>
+
+                <div class="tool-options" id="texfmt-options">
+                    <label>
+                        File:
+                        <select id="fmt-file"></select>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="wrap" checked> Wrap lines
+                    </label>
+                    <label>
+                        Wrap length: <input type="number" id="wraplen" min="40" max="120" value="80">
+                    </label>
+                    <label>
+                        Tab size: <input type="number" id="tabsize-fmt" min="1" max="8" value="2">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="usetabs"> Use tabs
+                    </label>
+                </div>
+
+                <div class="tool-options" id="texcount-options" style="display: none;">
+                    <label>
+                        Main file:
+                        <select id="count-file"></select>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="brief"> Brief
+                    </label>
+                    <label>
+                        <input type="checkbox" id="total"> Total
+                    </label>
+                    <label>
+                        <input type="checkbox" id="sum" checked> Sum
+                    </label>
+                    <label>
+                        Verbosity: <input type="number" id="verbose" min="0" max="4" value="0">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="include-files"> Include referenced files
+                    </label>
+                    <label>
+                        <input type="checkbox" id="merge"> Merge counts
+                    </label>
+                    <button type="button" id="load-multifile-example" class="secondary-button">Load Multi-File
+                        Example</button>
+                </div>
+
+                <div class="tool-options" id="latexdiff-options" style="display: none;">
+                    <label>
+                        Old file:
+                        <select id="diff-old-file"></select>
+                    </label>
+                    <label>
+                        New file:
+                        <select id="diff-new-file"></select>
+                    </label>
+                    <label>
+                        Markup type:
+                        <select id="diff-type">
+                            <option value="UNDERLINE" selected>Underline</option>
+                            <option value="CTRADITIONAL">Color Traditional</option>
+                            <option value="CFONT">Color Font</option>
+                            <option value="CHANGEBAR">Change Bar</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="tool-options" id="latexpand-options" style="display: none;">
+                    <label>
+                        Main file:
+                        <select id="expand-file"></select>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="keep-comments"> Keep comments
+                    </label>
+                    <label>
+                        <input type="checkbox" id="empty-comments"> Empty comments
+                    </label>
+                    <label>
+                        <input type="checkbox" id="expand-usepackage"> Expand usepackage
+                    </label>
+                    <label>
+                        <input type="checkbox" id="makeatletter"> Makeatletter
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-graphics"> Show graphics
+                    </label>
+                    <label>
+                        <input type="checkbox" id="fatal"> Fatal on error
+                    </label>
+                </div>
+
+                <button id="run-tool" class="primary-button">Run Tool</button>
+                <button id="clear-output">Clear Output</button>
             </div>
 
-            <div class="editor-panel">
-                <h3>Output</h3>
-                <div id="output-display"></div>
-            </div>
-        </div>
+            <div class="editors">
+                <div class="editor-panel">
+                    <div class="editor-header">
+                        <h3>Input</h3>
+                        <div id="file-tabs" class="file-tabs"></div>
+                        <button type="button" id="add-file-btn" class="icon-button" title="Add file">+</button>
+                    </div>
+                    <div id="input-editor"></div>
+                </div>
 
-        <div id="status" class="status"></div>
+                <div class="editor-panel">
+                    <h3>Output</h3>
+                    <div id="output-display"></div>
+                </div>
+            </div>
+
+            <div id="status" class="status"></div>
+        </section>
+
+        <section class="features">
+            <h2>Features</h2>
+            <ul>
+                <li><strong>TexCount</strong>: Count words in LaTeX documents with multi-file support</li>
+                <li><strong>LaTeX Diff</strong>: Generate diff documents showing changes between files</li>
+                <li><strong>Latexpand</strong>: Expand LaTeX documents by inlining included files</li>
+                <li><strong>TeX-Fmt</strong>: Format and beautify LaTeX documents using (wasm-bindgen)</li>
+                <li>All tools run entirely in the browser with no server required</li>
+                <li>Support for complex multi-file LaTeX projects</li>
+            </ul>
+        </section>
+
+        <section class="installation">
+            <h2>Installation</h2>
+            <pre><code>npm install wasm-latex-tools
+npx wasm-latex-tools copy-assets</code></pre>
+        </section>
+
+        <section class="usage">
+            <h2>Usage</h2>
+            <pre><code>import { WebPerlRunner, TexCount, TexFmt } from 'wasm-latex-tools';
+
+const runner = new WebPerlRunner();
+await runner.initialize();
+
+const texCount = new TexCount(runner);
+const result = await texCount.count({ input: '...' });
+
+const texFmt = new TexFmt();
+const formatted = await texFmt.format({ input: '...', wrap: true });</code></pre>
+        </section>
     </main>
 
     <footer>
-        <p>MIT License &copy; 2025 | Powered by WebPerl</p>
+        <p>AGPL-3.0 License &copy; 2025 <a href="https://abawi.me">Fares Abawi</a> | Powered by WebPerl & Rust WASM
+            (wasm-bindgen)</p>
     </footer>
 </body>
 

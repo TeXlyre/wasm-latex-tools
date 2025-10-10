@@ -8,7 +8,7 @@ export class TexFmt {
     private wasmModule: any = null;
     private wasmBasePath: string;
 
-    constructor(verbose: boolean = false, wasmBasePath: string = '/texfmt') {
+    constructor(verbose: boolean = false, wasmBasePath: string = '/core/texfmt') {
         this.logger = new Logger(verbose);
         this.wasmBasePath = wasmBasePath;
     }

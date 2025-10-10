@@ -1,6 +1,14 @@
 {
-    "name": "webperl-latex-tools-example",
+    "name": "wasm-latex-tools-example",
     "version": "1.0.0",
+    "description": "GitHub Pages Demo for WASM LaTeX Tools",
+    "author": "Fares Abawi <fares@abawi.me> (https://abawi.me)",
+    "license": "AGPL-3.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TeXlyre/wasm-latex-tools.git"
+    },
+    "homepage": "https://texlyre.github.io/wasm-latex-tools/",
     "private": true,
     "scripts": {
         "start": "webpack serve --mode development",
