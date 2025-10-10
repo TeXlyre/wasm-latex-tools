@@ -32,6 +32,8 @@ interface FileTab {
     isMain: boolean;
 }
 
+const basePath = document.querySelector('base')?.getAttribute('href') || '';
+
 class LatexToolsDemo {
     private inputEditor: EditorView;
     private outputView: HTMLElement;
@@ -46,13 +48,13 @@ class LatexToolsDemo {
 
     constructor() {
         this.runner = new WebPerlRunner({
-            webperlBasePath: '/core/webperl',
-            perlScriptsPath: '/core/perl',
+            webperlBasePath: `${basePath}core/webperl`,
+            perlScriptsPath: `${basePath}core/perl`,
             verbose: true
         });
 
         this.texCount = new TexCount(this.runner, true);
-        this.texFmt = new TexFmt(true);
+        this.texFmt = new TexFmt(true, `${basePath}core/texfmt`);
         this.latexDiff = new LatexDiff(this.runner, true);
         this.latexpand = new Latexpand(this.runner, true);
 
