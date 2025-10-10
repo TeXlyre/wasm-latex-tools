@@ -74,7 +74,7 @@ const runner = new WebPerlRunner({
 });
 ```
 
-### TexCount with Multi-File Support
+### TeXcount with Multi-File Support
 
 ```typescript
 const texCount = new TexCount(runner);
@@ -93,7 +93,7 @@ const parsed = texCount.parseOutput(result.output);
 console.log(`Words: ${parsed.words}, Headers: ${parsed.headers}`);
 ```
 
-### LaTeX Diff
+### Latexdiff
 
 ```typescript
 import { LatexDiff } from 'wasm-latex-tools';
@@ -157,7 +157,7 @@ const runner = new WebPerlRunner({
 await runner.initialize();
 ```
 
-### TexCount
+### TeXcount
 
 Count words in LaTeX documents.
 
@@ -179,7 +179,7 @@ const parsed = texCount.parseOutput(result.output);
 // Returns: { words: number, headers: number, captions: number, raw: string }
 ```
 
-### LatexDiff
+### Latexdiff
 
 Generate diff documents between two LaTeX files.
 
@@ -216,7 +216,7 @@ const result = await latexpand.expand({
 });
 ```
 
-### TexFmt
+### TeX-Fmt
 
 Format LaTeX documents with Rust WASM (wasm-bindgen), with **no** runner needed.
 
@@ -404,9 +404,9 @@ WebPerl runs in WASM with limited memory. For very large projects, consider spli
 
 - [WebPerl](http://webperl.zero-g.net/) - Perl 5 compiled to WebAssembly
 - [tex-fmt](https://github.com/WGUNDERWOOD/tex-fmt) - LaTeX formatter in Rust
-- [texcount](https://ctan.org/pkg/texcount) - Word counting for LaTeX
-- [latexdiff](https://ctan.org/pkg/latexdiff) - LaTeX diff tool
-- [latexpand](https://ctan.org/pkg/latexpand) - LaTeX expander
+- [texcount](https://ctan.org/pkg/texcount) - Word counting for LaTeX in Perl
+- [latexdiff](https://ctan.org/pkg/latexdiff) - LaTeX diff tool in Perl
+- [latexpand](https://ctan.org/pkg/latexpand) - LaTeX expander in Perl
 
 
 ## Contributing
