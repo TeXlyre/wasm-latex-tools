@@ -72,7 +72,6 @@ class LatexToolsDemo {
     private texFmt: TexFmt;
     private latexDiff: LatexDiff;
     private currentTool: 'texcount' | 'texfmt' | 'latexdiff' = 'texfmt';
-    private oldContent: string = '';
     private files: Map<string, FileTab> = new Map();
     private activeFile: string = 'main.tex';
 
@@ -171,6 +170,14 @@ class LatexToolsDemo {
 
             tabsContainer.appendChild(tab);
         });
+
+        if (this.currentTool === 'latexdiff') {
+            this.updateDiffFileSelectors();
+        } else if (this.currentTool === 'texfmt') {
+            this.updateFmtFileSelector();
+        } else if (this.currentTool === 'texcount') {
+            this.updateCountFileSelector();
+        }
     }
 
     private switchToFile(filename: string): void {
@@ -339,6 +346,67 @@ Further research is needed to validate these results.`,
         texcountOptions.style.display = this.currentTool === 'texcount' ? 'block' : 'none';
         texfmtOptions.style.display = this.currentTool === 'texfmt' ? 'block' : 'none';
         latexdiffOptions.style.display = this.currentTool === 'latexdiff' ? 'block' : 'none';
+
+        if (this.currentTool === 'latexdiff') {
+            this.updateDiffFileSelectors();
+        } else if (this.currentTool === 'texfmt') {
+            this.updateFmtFileSelector();
+        } else if (this.currentTool === 'texcount') {
+            this.updateCountFileSelector();
+        }
+    }
+
+    private updateDiffFileSelectors(): void {
+        const oldFileSelect = document.getElementById('diff-old-file') as HTMLSelectElement;
+        const newFileSelect = document.getElementById('diff-new-file') as HTMLSelectElement;
+
+        oldFileSelect.innerHTML = '';
+        newFileSelect.innerHTML = '';
+
+        this.files.forEach((file, filename) => {
+            const optionOld = document.createElement('option');
+            optionOld.value = filename;
+            optionOld.textContent = filename;
+            oldFileSelect.appendChild(optionOld);
+
+            const optionNew = document.createElement('option');
+            optionNew.value = filename;
+            optionNew.textContent = filename;
+            newFileSelect.appendChild(optionNew);
+        });
+
+        if (this.files.size > 1) {
+            const fileNames = Array.from(this.files.keys());
+            newFileSelect.value = fileNames[fileNames.length - 1];
+        }
+    }
+
+    private updateFmtFileSelector(): void {
+        const fmtFileSelect = document.getElementById('fmt-file') as HTMLSelectElement;
+        fmtFileSelect.innerHTML = '';
+
+        this.files.forEach((file, filename) => {
+            const option = document.createElement('option');
+            option.value = filename;
+            option.textContent = filename;
+            fmtFileSelect.appendChild(option);
+        });
+
+        fmtFileSelect.value = this.activeFile;
+    }
+
+    private updateCountFileSelector(): void {
+        const countFileSelect = document.getElementById('count-file') as HTMLSelectElement;
+        countFileSelect.innerHTML = '';
+
+        this.files.forEach((file, filename) => {
+            const option = document.createElement('option');
+            option.value = filename;
+            option.textContent = filename;
+            countFileSelect.appendChild(option);
+        });
+
+        countFileSelect.value = 'main.tex';
     }
 
     private async initializeTools(): Promise<void> {
@@ -354,22 +422,16 @@ Further research is needed to validate these results.`,
 
     private async runCurrentTool(): Promise<void> {
         this.saveCurrentFile();
-        const mainFile = this.files.get('main.tex');
-
-        if (!mainFile || !mainFile.content.trim()) {
-            this.setStatus('Please provide input in main.tex', 'warning');
-            return;
-        }
 
         this.setStatus(`Running ${this.currentTool}...`, 'info');
 
         try {
             if (this.currentTool === 'texcount') {
-                await this.runTexCount(mainFile.content);
+                await this.runTexCount('');
             } else if (this.currentTool === 'latexdiff') {
-                await this.runLatexDiff(mainFile.content);
+                await this.runLatexDiff('');
             } else {
-                await this.runTexFmt(mainFile.content);
+                await this.runTexFmt('');
             }
         } catch (error) {
             this.setStatus(`Error: ${error}`, 'error');
@@ -378,11 +440,20 @@ Further research is needed to validate these results.`,
     }
 
     private async runTexCount(input: string): Promise<void> {
+        const countFileSelect = document.getElementById('count-file') as HTMLSelectElement;
+        const selectedFilename = countFileSelect.value;
+        const selectedFile = this.files.get(selectedFilename);
+
+        if (!selectedFile || !selectedFile.content.trim()) {
+            this.setStatus('Please select a valid file', 'warning');
+            return;
+        }
+
         const includeFiles = (document.getElementById('include-files') as HTMLInputElement).checked;
         const merge = (document.getElementById('merge') as HTMLInputElement).checked;
 
         const options: TexCountOptions = {
-            input,
+            input: selectedFile.content,
             brief: (document.getElementById('brief') as HTMLInputElement).checked,
             total: (document.getElementById('total') as HTMLInputElement).checked,
             sum: (document.getElementById('sum') as HTMLInputElement).checked,
@@ -392,7 +463,7 @@ Further research is needed to validate these results.`,
         };
 
         if (includeFiles) {
-            const additionalFiles = this.extractIncludedFiles(input);
+            const additionalFiles = this.extractIncludedFiles(selectedFile.content);
             if (additionalFiles.length > 0) {
                 options.additionalFiles = additionalFiles;
                 const fileList = additionalFiles.map(f => f.path).join(', ');
@@ -446,8 +517,17 @@ Further research is needed to validate these results.`,
     }
 
     private async runTexFmt(input: string): Promise<void> {
+        const fmtFileSelect = document.getElementById('fmt-file') as HTMLSelectElement;
+        const selectedFilename = fmtFileSelect.value;
+        const selectedFile = this.files.get(selectedFilename);
+
+        if (!selectedFile || !selectedFile.content.trim()) {
+            this.setStatus('Please select a valid file', 'warning');
+            return;
+        }
+
         const options: TexFmtOptions = {
-            input,
+            input: selectedFile.content,
             wrap: (document.getElementById('wrap') as HTMLInputElement).checked,
             wraplen: parseInt((document.getElementById('wraplen') as HTMLInputElement).value, 10),
             tabsize: parseInt((document.getElementById('tabsize-fmt') as HTMLInputElement).value, 10),
@@ -466,23 +546,36 @@ Further research is needed to validate these results.`,
     }
 
     private async runLatexDiff(input: string): Promise<void> {
-        if (!this.oldContent) {
-            this.oldContent = input;
-            this.setStatus('Saved current version as "old". Make changes and run again to see diff.', 'success');
+        const oldFileSelect = document.getElementById('diff-old-file') as HTMLSelectElement;
+        const newFileSelect = document.getElementById('diff-new-file') as HTMLSelectElement;
+
+        const oldFilename = oldFileSelect.value;
+        const newFilename = newFileSelect.value;
+
+        const oldFile = this.files.get(oldFilename);
+        const newFile = this.files.get(newFilename);
+
+        if (!oldFile || !newFile) {
+            this.setStatus('Please select valid old and new files', 'error');
+            return;
+        }
+
+        if (oldFilename === newFilename) {
+            this.setStatus('Please select different files for comparison', 'warning');
             return;
         }
 
         const options: LatexDiffOptions = {
-            input,
-            oldContent: this.oldContent,
+            input: newFile.content,
+            oldContent: oldFile.content,
             type: (document.getElementById('diff-type') as HTMLSelectElement).value as any
         };
 
-        const result = await this.latexDiff.diff(this.oldContent, input, options);
+        const result = await this.latexDiff.diff(oldFile.content, newFile.content, options);
 
         if (result.success) {
             this.displayOutput(result.output, false);
-            this.setStatus('Diff completed. Click "Clear Output" to reset for new comparison.', 'success');
+            this.setStatus(`Diff completed: ${oldFilename} → ${newFilename}`, 'success');
         } else {
             this.displayOutput(result.error || 'Unknown error', true);
             this.setStatus('Diff failed', 'error');
@@ -517,12 +610,7 @@ Further research is needed to validate these results.`,
 
     private clearOutput(): void {
         this.outputView.innerHTML = '';
-        if (this.currentTool === 'latexdiff') {
-            this.oldContent = '';
-            this.setStatus('Output cleared. Old content reset.', 'info');
-        } else {
-            this.setStatus('Output cleared', 'info');
-        }
+        this.setStatus('Output cleared', 'info');
     }
 
     private setStatus(message: string, type: 'info' | 'success' | 'error' | 'warning'): void {

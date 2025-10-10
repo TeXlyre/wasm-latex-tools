@@ -32,6 +32,10 @@
 
             <div class="tool-options" id="texfmt-options">
                 <label>
+                    File:
+                    <select id="fmt-file"></select>
+                </label>
+                <label>
                     <input type="checkbox" id="wrap" checked> Wrap lines
                 </label>
                 <label>
@@ -46,6 +50,10 @@
             </div>
 
             <div class="tool-options" id="texcount-options" style="display: none;">
+                <label>
+                    Main file:
+                    <select id="count-file"></select>
+                </label>
                 <label>
                     <input type="checkbox" id="brief"> Brief
                 </label>
@@ -69,6 +77,14 @@
             </div>
 
             <div class="tool-options" id="latexdiff-options" style="display: none;">
+                <label>
+                    Old file:
+                    <select id="diff-old-file"></select>
+                </label>
+                <label>
+                    New file:
+                    <select id="diff-new-file"></select>
+                </label>
                 <label>
                     Markup type:
                     <select id="diff-type">
