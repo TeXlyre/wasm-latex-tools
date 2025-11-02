@@ -1,6 +1,6 @@
 {
     "name": "wasm-latex-tools",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Run LaTeX tools (texcount, latexdiff, latexpand, tex-fmt) in the browser using WebAssembly",
     "author": "Fares Abawi <fares@abawi.me> (https://abawi.me)",
     "license": "AGPL-3.0",
