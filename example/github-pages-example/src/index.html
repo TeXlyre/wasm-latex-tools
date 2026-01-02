@@ -193,11 +193,16 @@ const formatted = await texFmt.format({ input: '...', wrap: true });</code></pre
         </section>
     </main>
 
-    <footer>
-        <p>AGPL-3.0 License &copy; {new Date().getFullYear()} <a href="https://abawi.me">Fares Abawi</a> | Powered by WebPerl & Rust WASM
-            (wasm-bindgen)
-        </p>
-    </footer>
+
+<footer>
+  <p>AGPL-3.0 License &copy; <span id="year"></span> <a href="https://abawi.me">Fares Abawi</a>| Powered by WebPerl & Rust WASM (wasm-bindgen)</p>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+
 </body>
 
 </html>
