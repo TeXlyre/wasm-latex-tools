@@ -415,5 +415,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-AGPL-3.0 License © 2025 [Fares Abawi](https://abawi.me)
+AGPL-3.0 License. See [LICENSE](LICENSE) file for details.
 
